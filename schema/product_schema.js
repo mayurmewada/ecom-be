@@ -5,6 +5,14 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    brand: {
+        type: String,
+        require: true,
+    },
+    ram: {
+        type: String,
+        require: true,
+    },
     category: {
         type: [String],
         require: true,
@@ -27,6 +35,6 @@ const productSchema = new mongoose.Schema({
     },
 });
 
-const Product = new mongoose.model("products", productSchema);
+const productModel = new mongoose.model("products", productSchema);
 
-module.exports = Product;
+module.exports = productModel;
