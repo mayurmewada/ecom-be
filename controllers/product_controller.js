@@ -1,7 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
-const multer = require("multer");
-const csvtojson = require("csvtojson");
 const XLSX = require("xlsx");
 const productModel = require("../schema/product_schema");
 const app = express();

@@ -1,10 +1,9 @@
 const connectDB = require("./db/connect");
 const express = require("express");
 const cors = require("cors");
-const multer = require("multer");
-const csvtojson = require("csvtojson");
 const product_route = require("./routes/product_route");
 const filter_route = require("./routes/filter_route");
+const search_route = require("./routes/search_route");
 
 const app = express();
 
@@ -20,3 +19,4 @@ connectDB().then(() => {
 app.use(express.static("public"));
 app.use("/api", product_route);
 app.use("/api", filter_route);
+app.use("/api", search_route);
