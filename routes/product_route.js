@@ -9,7 +9,7 @@ const route = express.Router();
 
 const upload = multer({ dest: "uploads/" });
 
-route.get("/products", getAllProducts);
+route.post("/products", getAllProducts);
 route.post("/products/filter", getFilteredProducts);
 route.post("/product/create", createProduct);
 route.post("/product/import", multer({ dest: "uploads/" }).any(), importProducts);

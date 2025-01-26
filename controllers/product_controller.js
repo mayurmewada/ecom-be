@@ -6,7 +6,8 @@ const app = express();
 app.use(express.json());
 
 const getAllProducts = async (req, res) => {
-    const products = await productModel.find({});
+    const { category } = req.body;
+    const products = await productModel.where({ category: category });
     try {
         res.json({
             status: 200,
@@ -39,6 +40,8 @@ const importProducts = async (req, res) => {
         const sheetName = workbook.SheetNames[0];
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
+        await productModel.deleteMany();
+
         await productModel.insertMany(data);
 
         res.status(200).send({ data, sheetName });
@@ -50,7 +53,8 @@ const importProducts = async (req, res) => {
 
 const getFilteredProducts = async (req, res) => {
     try {
-        const filters = req.body;
+        const [category, filters] = req.body;
+        console.log(category, filters);
         const constructQuery = (filters) => {
             const query = {};
 
@@ -60,20 +64,21 @@ const getFilteredProducts = async (req, res) => {
                 }
             });
 
+            console.log(query);
             return query;
         };
         const query = constructQuery(filters);
-        const products = await productModel.find(query);
-        
+        const products = await productModel.where({ category: category }).find(query);
+
         res.status(200).json({
-            data: products
-        })
+            data: products,
+        });
     } catch (error) {
         console.log(error);
         res.status(500).json({
             messgae: "error from product_controller/getFilteredProducts",
-            error
-        })
+            error,
+        });
     }
 };
 

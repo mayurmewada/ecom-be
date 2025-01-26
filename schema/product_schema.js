@@ -5,6 +5,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    category: {
+        type: String,
+        require: true,
+    },
     brand: {
         type: String,
         require: true,
@@ -13,8 +17,28 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    category: {
-        type: [String],
+    type: {
+        type: String,
+        require: true,
+    },
+    author: {
+        type: String,
+        require: true,
+    },
+    language: {
+        type: String,
+        require: true,
+    },
+    gender: {
+        type: String,
+        require: true,
+    },
+    years: {
+        type: String,
+        require: true,
+    },
+    size: {
+        type: String,
         require: true,
     },
     price: {
