@@ -1,6 +1,7 @@
 const connectDB = require("./db/connect");
 const express = require("express");
 const cors = require("cors");
+const home_route = require("./routes/home_route");
 const product_route = require("./routes/product_route");
 const filter_route = require("./routes/filter_route");
 const search_route = require("./routes/search_route");
@@ -17,6 +18,7 @@ connectDB().then(() => {
 });
 
 app.use(express.static("public"));
+app.use("/api", home_route);
 app.use("/api", product_route);
 app.use("/api", filter_route);
 app.use("/api", search_route);
