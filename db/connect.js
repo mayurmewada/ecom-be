@@ -1,8 +1,12 @@
 const { mongoose } = require("mongoose");
+require('dotenv').config()
 
 const connectDB = async () => {
     try {
-        await mongoose.connect("mongodb://localhost:27017/ecom-db");
+        await mongoose.connect(process.env.MONGOURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         console.log("db connection success");
     } catch (error) {
         console.log("db connection failed", error);
@@ -10,4 +14,4 @@ const connectDB = async () => {
     }
 };
 
-module.exports = connectDB
+module.exports = connectDB;
