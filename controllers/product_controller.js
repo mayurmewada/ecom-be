@@ -7,7 +7,8 @@ app.use(express.json());
 
 const getAllProducts = async (req, res) => {
     const { category } = req.body;
-    const products = await productModel.where({ category: category });
+    const products = await productModel.where({ category: category }).select("name images price");
+
     try {
         res.json({
             status: 200,
@@ -82,4 +83,18 @@ const getFilteredProducts = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, createProduct, importProducts, getFilteredProducts };
+const getProductDetails = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const productDetail = await productModel.find({ _id: productId });
+        res.status(200).json({
+            data: productDetail,
+        });
+    } catch (error) {
+        res.status(500).json({
+            messgae: "error from product_controller/getProductDetails",
+        });
+    }
+};
+
+module.exports = { getAllProducts, createProduct, importProducts, getFilteredProducts, getProductDetails };
