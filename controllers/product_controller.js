@@ -87,12 +87,22 @@ const getProductDetails = async (req, res) => {
     try {
         const { productId } = req.body;
         const productDetail = await productModel.find({ _id: productId });
-        res.status(200).json({
-            data: productDetail,
-        });
+        if (productDetail.length > 0) {
+            res.status(200).json({
+                status: 200,
+                data: productDetail,
+            });
+        } else {
+            res.status(200).json({
+                status: 404,
+                messgae: "Page not Found",
+            });
+        }
     } catch (error) {
-        res.status(500).json({
+        res.status(200).json({
+            status: 404,
             messgae: "error from product_controller/getProductDetails",
+            error: error
         });
     }
 };
