@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const authModel = require("../schema/auth_schema");
+const jwt = require("jsonwebtoken");
 
 const login = async (req, res) => {
     try {
@@ -16,8 +17,9 @@ const login = async (req, res) => {
                 message: "Invalid credentials",
             });
         }
+        const token = jwt.sign({ _id: isUserFound._id }, process.env.JWTSECRET, { expiresIn: "7d" });
         return res.status(200).json({
-            data: { email: isUserFound.email, _id: isUserFound._id },
+            data: { token },
             message: "User Loggedin Successfully",
         });
     } catch (error) {
