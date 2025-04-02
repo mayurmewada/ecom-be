@@ -5,19 +5,17 @@ const userModel = require("../schema/user_schema");
 const addToCart = async (req, res) => {
     try {
         const [productId, qntyCount, action] = req.body;
-        const token = req?.headers?.authorization.split(" ")?.[1];
+        const token = req?.headers?.authorization;
         const isVerifiedToken = jwt.verify(token, process.env.JWTSECRET);
         const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images");
 
         let qntyQuery;
         if (action === "incr") {
-            console.log(qntyCount);
             qntyQuery = { $inc: { "cart.$.qnty": qntyCount } };
         } else if (action === "decr") {
             qntyQuery = { $inc: { "cart.$.qnty": -qntyCount } };
         }
         const productExistInUserCart = await userModel.findOne({ _id: isVerifiedToken?._id, "cart._id": productId });
-        console.log(productExistInUserCart);
         if (!productExistInUserCart) {
             if (action === "incr") {
                 const initializeUserCart = await userModel.findOneAndUpdate(
@@ -41,20 +39,23 @@ const addToCart = async (req, res) => {
                     data: initializeUserCart.cart,
                 });
             } else {
-                if (productExistInUserCart.cart[0].qnty <= qntyCount) {
-                    const updateUserCart = await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id, "cart._id": productId }, { new: true, upsert: false, runValidators: true });
-                    console.log("product removed from cart")
-                }
-
                 return res.status(400).json({ success: false, message: "Product not found in cart to decrement." });
+            }
+        } else {
+            if (productExistInUserCart.cart[0].qnty <= qntyCount) {
+                await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id }, { $pull: { cart: { _id: productId } } }, { new: true, upsert: false, runValidators: true });
+                return res.status(200).json({
+                    success: true,
+                    message: "Product removed from Cart",
+                });
             }
         }
 
         const updateUserCart = await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id, "cart._id": productId }, qntyQuery, { new: true, upsert: false, runValidators: true });
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            data: [findProduct, token, isVerifiedToken, productExistInUserCart, updateUserCart, qntyQuery],
+            message: "Quantity updated in Cart",
         });
     } catch (error) {
         return res.status(500).json({
