@@ -5,10 +5,10 @@ exports.getUserDetails = async (req, res) => {
     try {
         const { authorization } = req.headers;
         console.log(authorization);
-        const isVerified = await jwt.verify(authorization.split(" ")[1], process.env.JWTSECRET);
-        const isUser = await userModel.findOne({ _id: isVerified._id }).select("-password");
+        const isVerified = jwt.verify(authorization.split(" ")[1], process.env.JWTSECRET);
+        const isUser = await userModel.findOne({ _id: isVerified._id }).select("-password -cart");
         res.status(200).json({
-            data: isUser,
+            isUser,
         });
     } catch (error) {
         res.status(500).json({

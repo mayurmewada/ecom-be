@@ -7,7 +7,7 @@ app.use(express.json());
 
 const getAllProducts = async (req, res) => {
     const { category } = req.body;
-    const products = await productModel.where({ category: category }).select("name images price");
+    const products = await productModel.where({ category: category }).select("name images price brand");
 
     try {
         res.json({

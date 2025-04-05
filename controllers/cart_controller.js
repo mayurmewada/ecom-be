@@ -66,4 +66,30 @@ const addToCart = async (req, res) => {
     }
 };
 
-module.exports = { addToCart };
+const cartLength = async (req, res) => {
+    try {
+        const token = req?.headers?.authorization.split(" ")[1];
+        const isVerified = jwt.verify(token, process.env.JWTSECRET);
+        if (!isVerified) {
+            return res.status(400).json({
+                success: false,
+                message: "Not authorized request",
+                data: token,
+            });
+        }
+        const { cart } = await userModel.findOne({ _id: isVerified._id }).select("cart");
+        return res.status(200).json({
+            success: true,
+            message: "yeiweds",
+            data: cart.length,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message || "Something went wrong",
+        });
+    }
+};
+
+module.exports = { addToCart, cartLength };
