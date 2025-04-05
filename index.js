@@ -15,15 +15,15 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// app.use(cors({
-//     origin: (origin, callBack) => {
-//         if (!origin || origin === process.env.DOMAINREQACCESS) {
-//             callBack(null, true)
-//         } else {
-//             callBack(new Error("Not allowed by CORS"));
-//         }
-//     }
-// }));
+app.use(cors({
+    origin: (origin, callBack) => {
+        if (!origin || origin === process.env.DOMAINREQACCESS) {
+            callBack(null, true)
+        } else {
+            callBack(new Error("Not allowed by CORS"));
+        }
+    }
+}));
 
 connectDB().then(() => {
     app.listen(5000, () => {
