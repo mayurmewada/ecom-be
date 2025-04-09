@@ -66,9 +66,35 @@ const addToCart = async (req, res) => {
     }
 };
 
+const cartDetails = async (req, res) => {
+    try {
+        const token = req?.headers?.authorization;
+        const verifiedToken = jwt.verify(token, process.env.JWTSECRET);
+        if (!verifiedToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Unauthorized Request",
+                error: error.message || "Something went wrong",
+            });
+        }
+        const data = await userModel.findOne({ _id: verifiedToken._id }).select("cart");
+        return res.status(200).json({
+            success: true,
+            message: "Cart fetched Successfully",
+            data,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message || "Something went wrong",
+        });
+    }
+};
+
 const cartLength = async (req, res) => {
     try {
-        const token = req?.headers?.authorization.split(" ")[1];
+        const token = req?.headers?.authorization;
         const isVerified = jwt.verify(token, process.env.JWTSECRET);
         if (!isVerified) {
             return res.status(400).json({
@@ -92,4 +118,4 @@ const cartLength = async (req, res) => {
     }
 };
 
-module.exports = { addToCart, cartLength };
+module.exports = { addToCart, cartDetails, cartLength };
