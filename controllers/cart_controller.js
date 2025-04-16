@@ -5,9 +5,10 @@ const userModel = require("../schema/user_schema");
 const addToCart = async (req, res) => {
     try {
         const [productId, qntyCount, action] = req.body;
+        console.log(productId, qntyCount, action)
         const token = req?.headers?.authorization;
         const isVerifiedToken = jwt.verify(token, process.env.JWTSECRET);
-        const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images");
+        const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images brand");
 
         let qntyQuery;
         if (action === "incr") {
@@ -28,6 +29,7 @@ const addToCart = async (req, res) => {
                                 name: findProduct.name,
                                 price: findProduct.price,
                                 images: findProduct.images,
+                                brand: findProduct.brand,
                             },
                         },
                     },

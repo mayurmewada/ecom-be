@@ -8,6 +8,7 @@ const filter_route = require("./routes/filter_route");
 const search_route = require("./routes/search_route");
 const user_route = require("./routes/user_route");
 const cart_route = require("./routes/cart_route");
+const order_route = require("./routes/order_route");
 require("dotenv").config();
 
 const app = express();
@@ -39,3 +40,4 @@ app.use("/api", filter_route);
 app.use("/api", search_route);
 app.use("/api", user_route);
 app.use("/api", cart_route)
+app.use("/api", order_route)
