@@ -1,14 +1,23 @@
 const jwt = require("jsonwebtoken");
 const Razorpay = require("razorpay");
+const userModel = require("../schema/user_schema");
 
 const instance = new Razorpay({
     key_id: process.env.RPKEYID,
     key_secret: process.env.RPKEYSECRET,
 });
 
+const getTotalCartAmount = (cart) => {
+    let total = 0;
+    cart.map((item) => {
+        total = total + item.price * item.qnty;
+    });
+    return total * 100;
+};
+
 exports.createOrder = async (req, res) => {
     try {
-        const token = req.headers.authorization.split(" ")[1];
+        const token = await req?.headers?.authorization;
         if (!token) {
             return res.status(400).json({
                 status: false,
@@ -22,8 +31,10 @@ exports.createOrder = async (req, res) => {
                 message: "Invalid Token",
             });
         }
+        const getUserCart = await userModel.findOne({ _id: verifiedToken._id }).select("cart");
+
         const options = {
-            amount: "100",
+            amount: getTotalCartAmount(getUserCart.cart).toString(),
             currency: "INR",
             receipt: "receipt_12345abcde",
         };
@@ -36,4 +47,3 @@ exports.createOrder = async (req, res) => {
         console.log(error.message || "Something went wrong");
     }
 };
-
