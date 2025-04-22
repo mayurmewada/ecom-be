@@ -5,7 +5,6 @@ const userModel = require("../schema/user_schema");
 const addToCart = async (req, res) => {
     try {
         const [productId, qntyCount, action] = req.body;
-        console.log(productId, qntyCount, action)
         const token = req?.headers?.authorization;
         const isVerifiedToken = jwt.verify(token, process.env.JWTSECRET);
         const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images brand");
@@ -17,6 +16,7 @@ const addToCart = async (req, res) => {
             qntyQuery = { $inc: { "cart.$.qnty": -qntyCount } };
         }
         const productExistInUserCart = await userModel.findOne({ _id: isVerifiedToken?._id, "cart._id": productId });
+        console.log(productExistInUserCart)
         if (!productExistInUserCart) {
             if (action === "incr") {
                 const initializeUserCart = await userModel.findOneAndUpdate(
@@ -44,7 +44,7 @@ const addToCart = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Product not found in cart to decrement." });
             }
         } else {
-            if (productExistInUserCart.cart[0].qnty <= qntyCount) {
+            if (productExistInUserCart.cart[0].qnty < qntyCount && action === "decr") {
                 await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id }, { $pull: { cart: { _id: productId } } }, { new: true, upsert: false, runValidators: true });
                 return res.status(200).json({
                     success: true,
