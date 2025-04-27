@@ -35,7 +35,6 @@ const createProduct = async (req, res) => {
 
 const importProducts = async (req, res) => {
     try {
-        console.log(req.files[0].path);
         const filePath = req.files[0].path;
         const workbook = XLSX.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
@@ -47,7 +46,6 @@ const importProducts = async (req, res) => {
 
         res.status(200).send({ data, sheetName });
     } catch (error) {
-        console.error(error);
         res.status(500).send({ error: "An error occurred" });
     }
 };
@@ -55,7 +53,6 @@ const importProducts = async (req, res) => {
 const getFilteredProducts = async (req, res) => {
     try {
         const [category, filters] = req.body;
-        console.log(category, filters);
         const constructQuery = (filters) => {
             const query = {};
 
@@ -65,7 +62,6 @@ const getFilteredProducts = async (req, res) => {
                 }
             });
 
-            console.log(query);
             return query;
         };
         const query = constructQuery(filters);
@@ -75,7 +71,6 @@ const getFilteredProducts = async (req, res) => {
             data: products,
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({
             messgae: "error from product_controller/getFilteredProducts",
             error,
