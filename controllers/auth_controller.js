@@ -18,6 +18,7 @@ const login = async (req, res) => {
             });
         }
         const token = jwt.sign({ _id: isUserFound._id }, process.env.JWTSECRET, { expiresIn: "7d" });
+        await userModel.findOneAndUpdate({ email }, { token });
         return res.status(200).json({
             data: { token },
             message: "User Loggedin Successfully",

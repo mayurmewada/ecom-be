@@ -3,9 +3,7 @@ const userModel = require("../schema/user_schema");
 
 exports.getUserDetails = async (req, res) => {
     try {
-        const token = req.headers.authorization;
-        const isVerified = jwt.verify(token.split(" ")[1], process.env.JWTSECRET);
-        const isUser = await userModel.findOne({ _id: isVerified._id }).select("-password -cart");
+        const isUser = await userModel.findOne({ _id: req.userId }).select("_id email phone");
         res.status(200).json({
             isUser,
         });

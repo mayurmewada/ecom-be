@@ -17,21 +17,7 @@ const getTotalCartAmount = (cart) => {
 
 exports.createOrder = async (req, res) => {
     try {
-        const token = await req?.headers?.authorization;
-        if (!token) {
-            return res.status(400).json({
-                status: false,
-                message: "Unauthorized Request",
-            });
-        }
-        const verifiedToken = jwt.verify(token, process.env.JWTSECRET);
-        if (!verifiedToken) {
-            return res.status(400).json({
-                status: false,
-                message: "Invalid Token",
-            });
-        }
-        const getUserCart = await userModel.findOne({ _id: verifiedToken._id }).select("cart");
+        const getUserCart = await userModel.findOne({ _id: req.userId }).select("cart");
 
         const options = {
             amount: getTotalCartAmount(getUserCart.cart).toString(),

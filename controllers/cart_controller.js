@@ -5,9 +5,9 @@ const userModel = require("../schema/user_schema");
 const addToCart = async (req, res) => {
     try {
         const [productId, qntyCount, action] = req.body;
-        const token = req?.headers?.authorization;
-        const isVerifiedToken = jwt.verify(token, process.env.JWTSECRET);
         const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images brand");
+
+        console.log(req.userId)
 
         let qntyQuery;
         if (action === "incr") {
@@ -15,11 +15,11 @@ const addToCart = async (req, res) => {
         } else if (action === "decr") {
             qntyQuery = { $inc: { "cart.$.qnty": -qntyCount } };
         }
-        const productExistInUserCart = await userModel.findOne({ _id: isVerifiedToken?._id, "cart._id": productId });
+        const productExistInUserCart = await userModel.findOne({ _id: req.userId, "cart._id": productId });
         if (!productExistInUserCart) {
             if (action === "incr") {
                 const initializeUserCart = await userModel.findOneAndUpdate(
-                    { _id: isVerifiedToken?._id },
+                    { _id: req.userId },
                     {
                         $push: {
                             cart: {
@@ -44,15 +44,14 @@ const addToCart = async (req, res) => {
             }
         } else {
             if (productExistInUserCart.cart[0].qnty <= qntyCount && action === "decr") {
-                await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id }, { $pull: { cart: { _id: productId } } }, { new: true, upsert: false, runValidators: true });
+                await userModel.findOneAndUpdate({ _id: req.userId }, { $pull: { cart: { _id: productId } } }, { new: true, upsert: false, runValidators: true });
                 return res.status(200).json({
                     success: true,
                     message: "Product removed from Cart",
                 });
             }
         }
-
-        const updateUserCart = await userModel.findOneAndUpdate({ _id: isVerifiedToken?._id, "cart._id": productId }, qntyQuery, { new: true, upsert: false, runValidators: true });
+        await userModel.findOneAndUpdate({ _id: req.userId, "cart._id": productId }, qntyQuery, { new: true, upsert: false, runValidators: true });
 
         return res.status(200).json({
             success: true,
@@ -69,16 +68,8 @@ const addToCart = async (req, res) => {
 
 const cartDetails = async (req, res) => {
     try {
-        const token = req?.headers?.authorization;
-        const verifiedToken = jwt.verify(token, process.env.JWTSECRET);
-        if (!verifiedToken) {
-            return res.status(400).json({
-                success: false,
-                message: "Unauthorized Request",
-                error: error.message || "Something went wrong",
-            });
-        }
-        const data = await userModel.findOne({ _id: verifiedToken._id }).select("cart");
+        console.log("cartDetails called")
+        const data = await userModel.findOne({ _id: req.userId }).select("cart");
         return res.status(200).json({
             success: true,
             message: "Cart fetched Successfully",
@@ -95,19 +86,10 @@ const cartDetails = async (req, res) => {
 
 const cartLength = async (req, res) => {
     try {
-        const token = req?.headers?.authorization;
-        const isVerified = jwt.verify(token, process.env.JWTSECRET);
-        if (!isVerified) {
-            return res.status(400).json({
-                success: false,
-                message: "Not authorized request",
-                data: token,
-            });
-        }
-        const { cart } = await userModel.findOne({ _id: isVerified._id }).select("cart");
+        console.log("cartLength called")
+        const { cart } = await userModel.findOne({ _id: req.userId }).select("cart");
         return res.status(200).json({
             success: true,
-            message: "yeiweds",
             data: cart.length,
         });
     } catch (error) {
