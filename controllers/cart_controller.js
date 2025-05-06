@@ -7,8 +7,6 @@ const addToCart = async (req, res) => {
         const [productId, qntyCount, action] = req.body;
         const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images brand");
 
-        console.log(req.userId)
-
         let qntyQuery;
         if (action === "incr") {
             qntyQuery = { $inc: { "cart.$.qnty": qntyCount } };
@@ -68,7 +66,6 @@ const addToCart = async (req, res) => {
 
 const cartDetails = async (req, res) => {
     try {
-        console.log("cartDetails called")
         const data = await userModel.findOne({ _id: req.userId }).select("cart");
         return res.status(200).json({
             success: true,
@@ -86,11 +83,12 @@ const cartDetails = async (req, res) => {
 
 const cartLength = async (req, res) => {
     try {
-        console.log("cartLength called")
         const { cart } = await userModel.findOne({ _id: req.userId }).select("cart");
+        let totalCartItems = 0;
+        cart.map((item) => totalCartItems += item.qnty)
         return res.status(200).json({
             success: true,
-            data: cart.length,
+            data: totalCartItems,
         });
     } catch (error) {
         return res.status(500).json({

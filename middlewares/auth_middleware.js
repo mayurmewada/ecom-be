@@ -21,7 +21,6 @@ exports.verifyToken = async (req, res, next) => {
             });
         }
         req.userId = isRealToken._id;
-        console.log(req.userId)
         next();
     } catch (error) {
         return res.status(400).json({
