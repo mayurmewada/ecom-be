@@ -5,7 +5,6 @@ const userModel = require("../schema/user_schema");
 const addToCart = async (req, res) => {
     try {
         const [productId, qntyCount, action] = req.body;
-        console.log(productId, qntyCount, action)
         const findProduct = await productModel.findOne({ _id: productId }).select("_id name price images brand");
 
         let qntyQuery;
@@ -15,10 +14,8 @@ const addToCart = async (req, res) => {
             qntyQuery = { $inc: { "cart.$.qnty": -qntyCount } };
         }
         const productExistInUserCart = await userModel.findOne({ _id: req.userId, "cart._id": productId },  { "cart.$": 1 });
-        console.log(productExistInUserCart)
         if (!productExistInUserCart) {
             if (action === "incr") {
-                console.log("inrement")
                 const initializeUserCart = await userModel.findOneAndUpdate(
                     { _id: req.userId },
                     {
@@ -41,13 +38,10 @@ const addToCart = async (req, res) => {
                     data: initializeUserCart.cart,
                 });
             } else {
-                console.log("Product not found in cart to decrement")
                 return res.status(400).json({ success: false, message: "Product not found in cart to decrement." });
             }
         } else {
-            console.log("test", productExistInUserCart.cart[0].qnty, qntyCount)
             if ((productExistInUserCart.cart[0].qnty <= qntyCount) && (action === "decr")) {
-                console.log("decrement", productExistInUserCart.cart[0].qnty, qntyCount)
                 await userModel.findOneAndUpdate({ _id: req.userId }, { $pull: { cart: { _id: productId } } }, { new: true, upsert: false, runValidators: true });
                 return res.status(200).json({
                     success: true,
@@ -55,7 +49,6 @@ const addToCart = async (req, res) => {
                 });
             }
         }
-        console.log("quantity update")
         await userModel.findOneAndUpdate({ _id: req.userId, "cart._id": productId }, qntyQuery, { new: true, upsert: false, runValidators: true });
 
         return res.status(200).json({
