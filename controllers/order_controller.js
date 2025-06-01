@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
 const Razorpay = require("razorpay");
 const userModel = require("../schema/user_schema");
+const { v4: uuidv4 } = require("uuid");
 
 const instance = new Razorpay({
     key_id: process.env.RPKEYID,
@@ -22,7 +22,7 @@ exports.createOrder = async (req, res) => {
         const options = {
             amount: getTotalCartAmount(getUserCart.cart).toString(),
             currency: "INR",
-            receipt: "receipt_12345abcde",
+            receipt: await uuidv4(),
         };
         const order = await instance.orders.create(options);
         res.status(200).json({
@@ -30,6 +30,18 @@ exports.createOrder = async (req, res) => {
             data: order,
         });
     } catch (error) {
-        console.log(error.message || "Something went wrong");
+        console.log(error, "error");
+    }
+};
+
+exports.myOrders = async (req, res) => {
+    try {
+        const userOrders = await userModel.findOne({ _id: req.userId }).select("orders");
+        res.status(200).json({
+            status: true,
+            data: userOrders,
+        });
+    } catch (error) {
+        console.log(error, "error");
     }
 };
