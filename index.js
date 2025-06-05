@@ -62,7 +62,7 @@ app.post("/api/razorpay/webhook", async (req, res) => {
                         _id: req?.body?.payload?.order?.entity?.receipt,
                         method: req?.body?.payload?.payment?.entity?.method,
                         refId: req?.body?.payload?.payment?.entity?.id,
-                        amount: req?.body?.payload?.payment?.entity?.amount,
+                        amount: req?.body?.payload?.payment?.entity?.amount / 100,
                         contact: req?.body?.payload?.payment?.entity?.contact,
                         email: req?.body?.payload?.payment?.entity?.email,
                         date: req?.body?.payload?.payment?.entity?.created_at,
