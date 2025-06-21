@@ -8,10 +8,10 @@ const getHomeData = async (req, res) => {
     try {
         const categories = await productModel.distinct("category");
         const trendingProducts = await productModel.find({}).sort({ poularityCount: -1 }).limit(10).select("name images price brand");
-        const home = { categories };
+        const home = { categories, trendingProducts };
         res.json({
             status: 200,
-            data: { home, trendingProducts },
+            data: home,
         });
     } catch (error) {
         console.log(error);
