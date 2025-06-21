@@ -82,6 +82,7 @@ const getProductDetails = async (req, res) => {
     try {
         const { productId } = req.body;
         const productDetail = await productModel.find({ _id: productId });
+        await productModel.updateOne({ _id: productId }, { $inc: { poularityCount: 1 } });
         if (productDetail.length > 0) {
             res.status(200).json({
                 status: 200,
@@ -97,7 +98,7 @@ const getProductDetails = async (req, res) => {
         res.status(200).json({
             status: 404,
             messgae: "error from product_controller/getProductDetails",
-            error: error
+            error: error,
         });
     }
 };

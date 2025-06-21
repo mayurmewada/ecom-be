@@ -57,6 +57,11 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    poularityCount: {
+        type: Number,
+        require: true,
+        default: 0,
+    },
 });
 
 const productModel = new mongoose.model("products", productSchema);

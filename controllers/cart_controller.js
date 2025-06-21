@@ -32,6 +32,7 @@ const addToCart = async (req, res) => {
                     },
                     { new: true, upsert: false, runValidators: true }
                 );
+                await productModel.updateOne({ _id: productId }, { $inc: { poularityCount: 3 } });
                 return res.status(200).json({
                     success: true,
                     message: "Product added to cart.",
